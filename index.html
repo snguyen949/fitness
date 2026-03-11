@@ -507,6 +507,89 @@
         
         .hidden-input { display: none; }
         
+        /* Streak Stats */
+        .streak-stats {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .streak-card {
+            flex: 1;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+        }
+        .streak-card.current {
+            background: linear-gradient(135deg, var(--accent-blue), #1d4ed8);
+            border: none;
+            color: #fff;
+        }
+        .streak-card.current .streak-label { color: rgba(255,255,255,0.85); }
+        .streak-card.current .streak-value { color: #fff; }
+        .streak-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+        .streak-value { font-size: 1.75rem; font-weight: 700; color: var(--text-primary); margin-top: 0.25rem; }
+        .streak-unit { font-size: 0.8rem; font-weight: 500; }
+        
+        /* Heatmap */
+        .heatmap-card { padding: 1rem; overflow-x: auto; }
+        .heatmap-container {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            min-width: fit-content;
+        }
+        .heatmap-row {
+            display: flex;
+            gap: 3px;
+            align-items: center;
+        }
+        .heatmap-day-label {
+            width: 24px;
+            font-size: 0.6rem;
+            color: var(--text-faint);
+            text-align: right;
+            padding-right: 4px;
+            flex-shrink: 0;
+        }
+        .heatmap-months {
+            display: flex;
+            padding-left: 28px;
+            margin-bottom: 4px;
+        }
+        .heatmap-month {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            flex: 1;
+            min-width: calc(4 * 12px + 3 * 3px);
+        }
+        .heatmap-cell {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+        .heatmap-cell.level-0 { background: var(--bg-tertiary); }
+        .heatmap-cell.level-1 { background: rgba(59, 130, 246, 0.3); }
+        .heatmap-cell.level-2 { background: rgba(59, 130, 246, 0.5); }
+        .heatmap-cell.level-3 { background: rgba(59, 130, 246, 0.7); }
+        .heatmap-cell.level-4 { background: var(--accent-blue); }
+        .dark .heatmap-cell.level-1 { background: rgba(96, 165, 250, 0.25); }
+        .dark .heatmap-cell.level-2 { background: rgba(96, 165, 250, 0.45); }
+        .dark .heatmap-cell.level-3 { background: rgba(96, 165, 250, 0.65); }
+        .dark .heatmap-cell.level-4 { background: var(--accent-blue); }
+        .heatmap-cell.empty { background: transparent; }
+        .heatmap-legend {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 4px;
+            margin-top: 0.75rem;
+            padding-right: 4px;
+        }
+        .heatmap-legend-label { font-size: 0.65rem; color: var(--text-faint); }
+        
         @media (min-width: 768px) {
             .app { max-width: 1200px; }
             .stats-grid { grid-template-columns: repeat(5, 1fr); }
@@ -536,6 +619,35 @@
             <!-- Dashboard Tab -->
             <div id="dashboard" class="tab-content active">
                 <div class="stats-grid" id="dashboardStats"></div>
+                
+                <div class="section-header">🔥 Workout Streak</div>
+                <div class="streak-stats" id="streakStats"></div>
+                <div class="section-header">📆 Activity Heatmap</div>
+                <div class="chart-card heatmap-card">
+                    <div class="heatmap-container" id="heatmapContainer"></div>
+                    <div class="heatmap-legend">
+                        <span class="heatmap-legend-label">Less</span>
+                        <span class="heatmap-cell level-0"></span>
+                        <span class="heatmap-cell level-1"></span>
+                        <span class="heatmap-cell level-2"></span>
+                        <span class="heatmap-cell level-3"></span>
+                        <span class="heatmap-cell level-4"></span>
+                        <span class="heatmap-legend-label">More</span>
+                    </div>
+                </div>
+                
+                <div class="section-header">🎯 Muscle Balance</div>
+                <div class="chart-card"><canvas id="muscleRadarChart"></canvas></div>
+                
+                <div class="section-header">📈 Exercise Progression</div>
+                <div class="chart-card">
+                    <select id="progressionExerciseSelect" class="select" style="margin-bottom:1rem;" onchange="renderProgressionChart()">
+                        <option value="">Select exercise...</option>
+                    </select>
+                    <canvas id="progressionChart"></canvas>
+                    <div id="progressionEmpty" class="no-workout" style="display:none;">Select an exercise to view progression</div>
+                </div>
+                
                 <div class="section-header">📅 Monthly Breakdown</div>
                 <div class="monthly-scroll" id="monthlyStats"></div>
                 <div class="section-header">💪 Muscle Distribution</div>
@@ -1006,9 +1118,13 @@
         }).join('');
         
         renderCharts(muscleCount, exerciseStats, all);
+        renderStreakStats(all);
+        renderHeatmap(all);
+        renderMuscleRadar(muscleCount);
+        populateProgressionSelect(exerciseStats);
     }
     
-    let muscleChart, exerciseChart, volumeChart;
+    let muscleChart, exerciseChart, volumeChart, radarChart, progressionChart;
     
     function renderCharts(muscleCount, exerciseStats, all) {
         const muscleColors = ['rgba(59,130,246,0.9)','rgba(139,92,246,0.9)','rgba(236,72,153,0.9)','rgba(245,158,11,0.9)','rgba(16,185,129,0.9)','rgba(20,184,166,0.9)','rgba(99,102,241,0.9)','rgba(239,68,68,0.9)'];
@@ -1058,6 +1174,314 @@
                 datasets: [{ label: 'Volume', data: volumeData, borderColor: lineColor, backgroundColor: fillColor, fill: true, tension: 0.4, pointRadius: 2 }]
             },
             options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { maxTicksLimit: 8, font: { size: 9 }, color: textColor } }, y: { grid: { color: gridColor }, ticks: { callback: v => v >= 1000 ? (v/1000) + 'K' : v, color: textColor } } } }
+        });
+    }
+    
+    // ===================== STREAK STATS =====================
+    function renderStreakStats(all) {
+        const dates = Object.keys(all).filter(d => all[d].some(w => w.exercises && w.exercises.length > 0)).sort();
+        
+        // Calculate current streak
+        let currentStreak = 0;
+        const today = new Date().toISOString().split('T')[0];
+        let checkDate = new Date(today);
+        
+        // Check if worked out today or yesterday to start streak
+        const todayStr = checkDate.toISOString().split('T')[0];
+        const yesterdayStr = new Date(checkDate - 86400000).toISOString().split('T')[0];
+        
+        if (dates.includes(todayStr) || dates.includes(yesterdayStr)) {
+            // Start from the most recent workout day
+            if (!dates.includes(todayStr)) {
+                checkDate = new Date(yesterdayStr + 'T00:00:00');
+            }
+            
+            while (true) {
+                const dateStr = checkDate.toISOString().split('T')[0];
+                if (dates.includes(dateStr)) {
+                    currentStreak++;
+                    checkDate = new Date(checkDate - 86400000);
+                } else {
+                    break;
+                }
+            }
+        }
+        
+        // Calculate longest streak
+        let longestStreak = 0;
+        let tempStreak = 0;
+        let prevDate = null;
+        
+        dates.forEach(d => {
+            const curr = new Date(d + 'T00:00:00');
+            if (prevDate) {
+                const diff = (curr - prevDate) / 86400000;
+                if (diff === 1) {
+                    tempStreak++;
+                } else {
+                    longestStreak = Math.max(longestStreak, tempStreak);
+                    tempStreak = 1;
+                }
+            } else {
+                tempStreak = 1;
+            }
+            prevDate = curr;
+        });
+        longestStreak = Math.max(longestStreak, tempStreak);
+        
+        // This week workouts
+        const thisWeekStart = new Date();
+        thisWeekStart.setDate(thisWeekStart.getDate() - thisWeekStart.getDay());
+        thisWeekStart.setHours(0, 0, 0, 0);
+        const thisWeekWorkouts = dates.filter(d => new Date(d + 'T00:00:00') >= thisWeekStart).length;
+        
+        document.getElementById('streakStats').innerHTML = `
+            <div class="streak-card current">
+                <div class="streak-label">Current Streak</div>
+                <div class="streak-value">${currentStreak} <span class="streak-unit">days</span></div>
+            </div>
+            <div class="streak-card">
+                <div class="streak-label">Longest Streak</div>
+                <div class="streak-value">${longestStreak} <span class="streak-unit">days</span></div>
+            </div>
+            <div class="streak-card">
+                <div class="streak-label">This Week</div>
+                <div class="streak-value">${thisWeekWorkouts} <span class="streak-unit">days</span></div>
+            </div>
+        `;
+    }
+    
+    // ===================== HEATMAP =====================
+    function renderHeatmap(all) {
+        const workoutDates = {};
+        Object.keys(all).forEach(d => {
+            const exercises = all[d].filter(w => w.exercises && w.exercises.length > 0);
+            if (exercises.length > 0) {
+                workoutDates[d] = exercises.reduce((sum, w) => sum + (w.total_sets || 0), 0);
+            }
+        });
+        
+        // Get last 16 weeks
+        const today = new Date();
+        const startDate = new Date(today);
+        startDate.setDate(startDate.getDate() - (16 * 7) - startDate.getDay());
+        
+        const dayLabels = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
+        const monthLabels = [];
+        
+        let html = '<div class="heatmap-months" id="heatmapMonths"></div>';
+        
+        // Build rows for each day of week
+        for (let dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
+            html += `<div class="heatmap-row"><span class="heatmap-day-label">${dayLabels[dayOfWeek]}</span>`;
+            
+            const d = new Date(startDate);
+            d.setDate(d.getDate() + dayOfWeek);
+            
+            while (d <= today) {
+                const dateStr = d.toISOString().split('T')[0];
+                const sets = workoutDates[dateStr] || 0;
+                let level = 0;
+                if (sets > 0) level = sets < 5 ? 1 : sets < 10 ? 2 : sets < 15 ? 3 : 4;
+                
+                if (dayOfWeek === 0) {
+                    const month = d.getMonth();
+                    const day = d.getDate();
+                    if (day <= 7) {
+                        monthLabels.push({ month, pos: monthLabels.length });
+                    }
+                }
+                
+                html += `<span class="heatmap-cell level-${level}" title="${dateStr}: ${sets} sets"></span>`;
+                d.setDate(d.getDate() + 7);
+            }
+            html += '</div>';
+        }
+        
+        document.getElementById('heatmapContainer').innerHTML = html;
+        
+        // Add month labels
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        let monthHtml = '';
+        let lastMonth = -1;
+        const d = new Date(startDate);
+        let weekCount = 0;
+        while (d <= today) {
+            if (d.getMonth() !== lastMonth && d.getDate() <= 7) {
+                monthHtml += `<span class="heatmap-month" style="margin-left:${weekCount > 0 ? 0 : 0}px;">${monthNames[d.getMonth()]}</span>`;
+                lastMonth = d.getMonth();
+            }
+            d.setDate(d.getDate() + 7);
+            weekCount++;
+        }
+        document.getElementById('heatmapMonths').innerHTML = monthHtml;
+    }
+    
+    // ===================== MUSCLE RADAR =====================
+    function renderMuscleRadar(muscleCount) {
+        const textColor = isDarkMode ? '#94a3b8' : '#64748b';
+        const gridColor = isDarkMode ? '#334155' : '#e2e8f0';
+        const fillColor = isDarkMode ? 'rgba(96,165,250,0.3)' : 'rgba(59,130,246,0.3)';
+        const lineColor = isDarkMode ? '#60a5fa' : '#3b82f6';
+        
+        // Define ideal muscle balance (all equal for balance reference)
+        const allMuscles = ['lats', 'chest', 'shoulders', 'biceps', 'triceps', 'abs', 'quads', 'hamstrings', 'glutes', 'calves'];
+        const labels = allMuscles.map(m => m.charAt(0).toUpperCase() + m.slice(1));
+        const data = allMuscles.map(m => muscleCount[m] || 0);
+        const maxVal = Math.max(...data, 1);
+        const normalizedData = data.map(d => (d / maxVal) * 100);
+        
+        if (radarChart) radarChart.destroy();
+        radarChart = new Chart(document.getElementById('muscleRadarChart'), {
+            type: 'radar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Your Training',
+                    data: normalizedData,
+                    backgroundColor: fillColor,
+                    borderColor: lineColor,
+                    borderWidth: 2,
+                    pointBackgroundColor: lineColor,
+                    pointRadius: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: { display: false },
+                        grid: { color: gridColor },
+                        angleLines: { color: gridColor },
+                        pointLabels: { color: textColor, font: { size: 10 } }
+                    }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+    }
+    
+    // ===================== EXERCISE PROGRESSION =====================
+    function populateProgressionSelect(exerciseStats) {
+        const select = document.getElementById('progressionExerciseSelect');
+        const exercises = Object.keys(exerciseStats).sort((a, b) => exerciseStats[b].reps - exerciseStats[a].reps);
+        select.innerHTML = '<option value="">Select exercise...</option>';
+        exercises.forEach(ex => {
+            select.innerHTML += `<option value="${ex}">${ex}</option>`;
+        });
+        
+        // Auto-select top exercise
+        if (exercises.length > 0) {
+            select.value = exercises[0];
+            renderProgressionChart();
+        }
+    }
+    
+    function renderProgressionChart() {
+        const exerciseName = document.getElementById('progressionExerciseSelect').value;
+        const canvas = document.getElementById('progressionChart');
+        const emptyMsg = document.getElementById('progressionEmpty');
+        
+        if (!exerciseName) {
+            canvas.style.display = 'none';
+            emptyMsg.style.display = 'block';
+            return;
+        }
+        
+        canvas.style.display = 'block';
+        emptyMsg.style.display = 'none';
+        
+        const all = getAllWorkouts();
+        const dates = Object.keys(all).sort();
+        
+        // Collect data points for this exercise
+        const dataPoints = [];
+        dates.forEach(date => {
+            all[date].forEach(w => {
+                (w.exercises || []).forEach(ex => {
+                    if (ex.name === exerciseName) {
+                        dataPoints.push({
+                            date,
+                            reps: ex.reps || 0,
+                            weight: ex.weight || 0,
+                            volume: (ex.reps || 0) * (ex.weight || 0),
+                            sets: ex.sets || 1
+                        });
+                    }
+                });
+            });
+        });
+        
+        if (dataPoints.length === 0) {
+            canvas.style.display = 'none';
+            emptyMsg.style.display = 'block';
+            return;
+        }
+        
+        const textColor = isDarkMode ? '#94a3b8' : '#64748b';
+        const gridColor = isDarkMode ? '#334155' : '#f1f5f9';
+        const lineColor = isDarkMode ? '#60a5fa' : '#3b82f6';
+        const fillColor = isDarkMode ? 'rgba(96,165,250,0.15)' : 'rgba(59,130,246,0.1)';
+        const lineColor2 = isDarkMode ? '#4ade80' : '#16a34a';
+        
+        if (progressionChart) progressionChart.destroy();
+        progressionChart = new Chart(canvas, {
+            type: 'line',
+            data: {
+                labels: dataPoints.map(d => d.date.substring(5)),
+                datasets: [
+                    {
+                        label: 'Total Reps',
+                        data: dataPoints.map(d => d.reps),
+                        borderColor: lineColor,
+                        backgroundColor: fillColor,
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 4,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'Weight (lbs)',
+                        data: dataPoints.map(d => d.weight),
+                        borderColor: lineColor2,
+                        backgroundColor: 'transparent',
+                        borderDash: [5, 5],
+                        tension: 0.3,
+                        pointRadius: 3,
+                        yAxisID: 'y1'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { 
+                        display: true, 
+                        position: 'bottom',
+                        labels: { boxWidth: 12, padding: 10, font: { size: 10 }, color: textColor }
+                    }
+                },
+                scales: {
+                    x: { grid: { display: false }, ticks: { maxTicksLimit: 8, font: { size: 9 }, color: textColor } },
+                    y: { 
+                        type: 'linear', 
+                        position: 'left',
+                        grid: { color: gridColor },
+                        title: { display: true, text: 'Reps', font: { size: 10 }, color: textColor },
+                        ticks: { color: textColor }
+                    },
+                    y1: {
+                        type: 'linear',
+                        position: 'right',
+                        grid: { display: false },
+                        title: { display: true, text: 'Weight', font: { size: 10 }, color: textColor },
+                        ticks: { color: textColor }
+                    }
+                }
+            }
         });
     }
     
