@@ -9,7 +9,7 @@
     <title>The Work</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Bebas+Neue&display=swap');
         
         /* CSS Custom Properties - Light Mode (default) */
         :root {
@@ -134,22 +134,35 @@
             align-items: center;
             flex-shrink: 0;
         }
-        .header-content { text-align: center; flex: 1; }
-        .header h1 { font-size: 1.25rem; font-weight: 700; color: var(--text-primary); }
-        .header .subtitle { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; }
+        .header-content { text-align: center; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         
-        /* T-800 Logo */
-        .logo-container {
-            width: 44px;
-            height: 44px;
+        /* The Work Logo */
+        .logo {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
+            flex-direction: column;
+            align-items: flex-start;
         }
-        .t800-logo {
-            width: 36px;
-            height: 36px;
+        .logo-the {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+        }
+        .logo-work {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 3rem;
+            color: var(--text-primary);
+            letter-spacing: 0.1em;
+            line-height: 0.85;
+        }
+        .logo-line {
+            width: 100%;
+            height: 4px;
+            background: var(--accent-blue);
+            margin-top: 3px;
+            border-radius: 2px;
         }
         
         /* Dark Mode Toggle */
@@ -414,9 +427,9 @@
         .quick-action-btn:active { background: var(--bg-tertiary); }
         
         .active-workout { background: var(--bg-card); border: 2px solid var(--accent-blue); border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
-        .active-workout-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .active-workout-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; gap: 1rem; }
         .active-workout-title { font-weight: 600; color: var(--text-primary); }
-        .active-workout-time { font-size: 0.8rem; color: var(--text-muted); }
+        .active-workout-time { font-size: 0.8rem; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
         
         .set-row { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; background: var(--bg-workout-entry); border-radius: 8px; margin-bottom: 0.5rem; }
         .set-number { width: 24px; height: 24px; background: var(--border-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); flex-shrink: 0; }
@@ -427,14 +440,30 @@
         .exercise-block { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem; margin-bottom: 0.75rem; }
         .exercise-block-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
         .exercise-block-name { font-weight: 600; color: var(--text-primary); font-size: 0.95rem; }
-        .exercise-block-muscle { font-size: 0.7rem; color: var(--text-muted); background: var(--bg-tertiary); padding: 0.2rem 0.5rem; border-radius: 4px; }
+        .exercise-block-muscle { font-size: 0.7rem; color: var(--text-muted); background: var(--bg-tertiary); padding: 0.2rem 0.5rem; border-radius: 4px; margin-left: 0.5rem; }
         .exercise-block-actions { display: flex; gap: 0.25rem; }
         
         .pr-badge { display: inline-flex; align-items: center; gap: 0.25rem; background: #fef3c7; color: #d97706; font-size: 0.7rem; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 4px; margin-left: 0.5rem; }
         .dark .pr-badge { background: #713f12; color: #fbbf24; }
         
-        .add-set-btn { width: 100%; padding: 0.5rem; border: 1px dashed var(--border-color); background: transparent; border-radius: 8px; color: var(--text-muted); font-size: 0.85rem; cursor: pointer; margin-top: 0.5rem; }
+        .set-actions { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+        .add-set-btn { flex: 1; padding: 0.5rem; border: 1px dashed var(--border-color); background: transparent; border-radius: 8px; color: var(--text-muted); font-size: 0.85rem; cursor: pointer; }
         .add-set-btn:active { background: var(--bg-tertiary); }
+        .quick-set-btn { flex: 1; padding: 0.5rem; border: 1px solid var(--accent-blue); background: transparent; border-radius: 8px; color: var(--accent-blue); font-size: 0.85rem; cursor: pointer; font-weight: 500; }
+        .quick-set-btn:active { background: var(--accent-blue); color: #fff; }
+        
+        .source-badge { font-size: 0.65rem; padding: 0.15rem 0.4rem; border-radius: 4px; font-weight: 600; margin-left: 0.5rem; }
+        .source-badge.imported { background: var(--bg-tertiary); color: var(--text-muted); }
+        .source-badge.manual { background: var(--accent-blue); color: #fff; }
+        
+        .workout-entry { background: var(--bg-workout-entry); border-radius: 12px; padding: 1rem; margin-bottom: 0.75rem; position: relative; }
+        .workout-entry .workout-name { font-weight: 600; font-size: 1.05rem; color: var(--text-primary); margin-bottom: 0.35rem; padding-right: 70px; line-height: 1.3; }
+        .workout-entry .workout-time { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+        .workout-entry .workout-stats-row { display: flex; gap: 1rem; font-size: 0.85rem; margin-bottom: 0.5rem; }
+        .workout-entry .exercise-item { display: flex; justify-content: space-between; padding: 0.5rem 0; font-size: 0.95rem; border-top: 1px solid var(--border-light); }
+        .workout-entry .exercise-item:first-child { border-top: none; }
+        .workout-entry .exercise-name { color: var(--text-primary); font-weight: 500; }
+        .workout-entry .exercise-details { color: var(--text-muted); font-size: 0.9rem; font-weight: 500; }
         
         .template-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem; margin-bottom: 0.75rem; cursor: pointer; }
         .template-card:active { background: var(--bg-tertiary); }
@@ -492,45 +521,13 @@
 <body>
     <div class="app">
         <div class="header">
-            <div class="logo-container">
-                <svg class="t800-logo" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <!-- T-800 Skull Outline -->
-                    <path d="M20 4C12 4 6 10 6 18C6 22 7 25 9 28L8 34C8 35.5 9 37 11 37H29C31 37 32 35.5 32 34L31 28C33 25 34 22 34 18C34 10 28 4 20 4Z" stroke="var(--text-primary)" stroke-width="1.5" fill="none"/>
-                    <!-- Jaw Structure -->
-                    <path d="M12 30H28" stroke="var(--text-primary)" stroke-width="1" opacity="0.6"/>
-                    <path d="M13 33H27" stroke="var(--text-primary)" stroke-width="1" opacity="0.4"/>
-                    <!-- Eye Sockets -->
-                    <ellipse cx="14" cy="17" rx="4" ry="4.5" stroke="var(--text-primary)" stroke-width="1.5" fill="none"/>
-                    <ellipse cx="26" cy="17" rx="4" ry="4.5" stroke="var(--text-primary)" stroke-width="1.5" fill="none"/>
-                    <!-- Glowing Red Eyes -->
-                    <circle cx="14" cy="17" r="2" fill="#ef4444">
-                        <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
-                    </circle>
-                    <circle cx="26" cy="17" r="2" fill="#ef4444">
-                        <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
-                    </circle>
-                    <!-- Eye Glow Effect -->
-                    <circle cx="14" cy="17" r="3" fill="#ef4444" opacity="0.3">
-                        <animate attributeName="r" values="2.5;3.5;2.5" dur="2s" repeatCount="indefinite"/>
-                        <animate attributeName="opacity" values="0.3;0.1;0.3" dur="2s" repeatCount="indefinite"/>
-                    </circle>
-                    <circle cx="26" cy="17" r="3" fill="#ef4444" opacity="0.3">
-                        <animate attributeName="r" values="2.5;3.5;2.5" dur="2s" repeatCount="indefinite"/>
-                        <animate attributeName="opacity" values="0.3;0.1;0.3" dur="2s" repeatCount="indefinite"/>
-                    </circle>
-                    <!-- Nose Cavity -->
-                    <path d="M20 20V24L18 26H22L20 24" stroke="var(--text-primary)" stroke-width="1" fill="none" opacity="0.7"/>
-                    <!-- Cheekbone Details -->
-                    <path d="M8 18C8 18 9 20 10 20" stroke="var(--text-primary)" stroke-width="1" opacity="0.5"/>
-                    <path d="M32 18C32 18 31 20 30 20" stroke="var(--text-primary)" stroke-width="1" opacity="0.5"/>
-                    <!-- Forehead Plate Lines -->
-                    <path d="M12 9C15 7 18 6 20 6C22 6 25 7 28 9" stroke="var(--text-primary)" stroke-width="1" opacity="0.4"/>
-                    <path d="M14 11C16 10 18 9.5 20 9.5C22 9.5 24 10 26 11" stroke="var(--text-primary)" stroke-width="1" opacity="0.3"/>
-                </svg>
-            </div>
+            <div style="width:44px;"></div>
             <div class="header-content">
-                <h1>The Work</h1>
-                <div class="subtitle" id="headerSubtitle">Loading...</div>
+                <div class="logo">
+                    <div class="logo-the">THE</div>
+                    <div class="logo-work">WORK</div>
+                    <div class="logo-line"></div>
+                </div>
             </div>
             <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle" title="Toggle dark mode">🌙</button>
         </div>
@@ -597,12 +594,12 @@
                     <div id="activeWorkoutContainer" style="display:none;">
                         <div class="active-workout">
                             <div class="active-workout-header">
-                                <input type="text" id="workoutName" class="input" placeholder="Workout Name" style="border:none;padding:0;font-weight:600;font-size:1rem;background:transparent;">
+                                <input type="text" id="workoutName" class="input" placeholder="Workout Name" style="border:none;padding:0;font-weight:600;font-size:1rem;background:transparent;flex:1;min-width:0;">
                                 <span class="active-workout-time" id="workoutTime"></span>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group" style="margin-bottom:0;">
                                 <label class="form-label">Start Time</label>
-                                <input type="time" id="workoutStartTime" class="input">
+                                <input type="time" id="workoutStartTime" class="input" style="max-width:140px;">
                             </div>
                         </div>
                         
@@ -676,7 +673,7 @@
     </div>
     
     <!-- Add Exercise Modal -->
-    <div class="modal-overlay" id="addExerciseModal">
+    <div class="modal-overlay" id="addExerciseModal" onclick="if(event.target===this)closeModal('addExerciseModal')">
         <div class="modal">
             <div class="modal-header">Add New Exercise</div>
             <div class="form-group">
@@ -707,7 +704,7 @@
     </div>
     
     <!-- Templates Modal -->
-    <div class="modal-overlay" id="templatesModal">
+    <div class="modal-overlay" id="templatesModal" onclick="if(event.target===this)closeModal('templatesModal')">
         <div class="modal">
             <div class="modal-header">Workout Templates</div>
             <div id="templatesList"></div>
@@ -716,7 +713,7 @@
     </div>
     
     <!-- Edit Workout Modal -->
-    <div class="modal-overlay" id="editWorkoutModal">
+    <div class="modal-overlay" id="editWorkoutModal" onclick="if(event.target===this)closeModal('editWorkoutModal')">
         <div class="modal">
             <div class="modal-header">Edit Workout</div>
             <div class="form-group">
@@ -739,7 +736,7 @@
     </div>
     
     <!-- Add Custom Muscle Modal -->
-    <div class="modal-overlay" id="addMuscleModal">
+    <div class="modal-overlay" id="addMuscleModal" onclick="if(event.target===this)closeModal('addMuscleModal')">
         <div class="modal">
             <div class="modal-header">Add Custom Muscle Group</div>
             <div class="form-group">
@@ -1008,9 +1005,6 @@
             </div>`;
         }).join('');
         
-        const latestDate = dates.sort().pop() || new Date().toISOString().split('T')[0];
-        document.getElementById('headerSubtitle').textContent = `Data through ${new Date(latestDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`;
-        
         renderCharts(muscleCount, exerciseStats, all);
     }
     
@@ -1114,13 +1108,17 @@
             document.getElementById('panelContent').innerHTML = '<div class="no-workout">No workouts on this day</div>';
             return;
         }
-        document.getElementById('panelContent').innerHTML = workouts.map(w => `
+        document.getElementById('panelContent').innerHTML = workouts.map(w => {
+            const sourceBadge = w.source === 'imported' 
+                ? '<span class="source-badge imported">Imported</span>' 
+                : '<span class="source-badge manual">Logged</span>';
+            return `
             <div class="workout-entry">
                 ${w.source === 'manual' ? `<div class="workout-entry-actions">
                     <button class="btn-edit" onclick="editWorkout('${w.id}')">✎</button>
                     <button class="btn-delete" onclick="deleteWorkout('${w.id}')">✕</button>
                 </div>` : ''}
-                <div class="workout-name">${w.name || 'Workout'}</div>
+                <div class="workout-name">${w.name || 'Workout'}${sourceBadge}</div>
                 <div class="workout-time">${w.time || ''}</div>
                 <div class="workout-stats-row"><span>Sets: <strong>${w.total_sets || 0}</strong></span><span>Cal: <strong>${w.calories || 0}</strong></span></div>
                 ${(w.exercises || []).length > 0 ? (w.exercises || []).map(ex => `
@@ -1130,7 +1128,7 @@
                     </div>
                 `).join('') : '<div class="exercise-item"><span class="exercise-name">Cardio/Walk</span></div>'}
             </div>
-        `).join('');
+        `}).join('');
     }
     
     let touchStartX = 0;
@@ -1160,21 +1158,24 @@
         dates.forEach(date => {
             all[date].forEach(w => {
                 if (!w.exercises || w.exercises.length === 0) return;
+                const sourceBadge = w.source === 'imported' 
+                    ? '<span class="source-badge imported">Imported</span>' 
+                    : '<span class="source-badge manual">Logged</span>';
                 html += `<div class="workout-entry">
                     ${w.source === 'manual' ? `<div class="workout-entry-actions">
                         <button class="btn-edit" onclick="editWorkout('${w.id}')">✎</button>
                         <button class="btn-delete" onclick="deleteWorkout('${w.id}')">✕</button>
                     </div>` : ''}
-                    <div class="workout-name">${w.name || 'Workout'}</div>
+                    <div class="workout-name">${w.name || 'Workout'}${sourceBadge}</div>
                     <div class="workout-time">${date} • ${w.time || ''}</div>
                     <div class="workout-stats-row"><span>Sets: <strong>${w.total_sets || 0}</strong></span></div>
-                    ${(w.exercises || []).slice(0, 3).map(ex => `
+                    ${(w.exercises || []).slice(0, 4).map(ex => `
                         <div class="exercise-item">
                             <span class="exercise-name">${ex.name}</span>
                             <span class="exercise-details">${ex.sets || 1}×${ex.reps}${ex.weight > 0 ? ` @${ex.weight}lb` : ''}</span>
                         </div>
                     `).join('')}
-                    ${(w.exercises || []).length > 3 ? `<div style="font-size:0.75rem;color:var(--text-faint);">+${w.exercises.length - 3} more...</div>` : ''}
+                    ${(w.exercises || []).length > 4 ? `<div style="font-size:0.8rem;color:var(--text-faint);padding-top:0.5rem;">+${w.exercises.length - 4} more...</div>` : ''}
                 </div>`;
             });
         });
@@ -1221,7 +1222,10 @@
                 <div class="exercise-block-actions"><button class="btn-delete" onclick="removeExerciseBlock('${blockId}')">✕</button></div>
             </div>
             <div class="sets-container" id="sets_${blockId}"></div>
-            <button class="add-set-btn" onclick="addSet('${blockId}')">+ Add Set</button>
+            <div class="set-actions">
+                <button class="add-set-btn" onclick="addSet('${blockId}')">+ Add Set</button>
+                <button class="quick-set-btn" onclick="quickAddSet('${blockId}')">⚡ Copy Last</button>
+            </div>
         `;
         container.appendChild(block);
         for (let i = 0; i < sets; i++) addSet(blockId, reps, weight);
@@ -1249,6 +1253,17 @@
         document.getElementById(setId).remove();
         const container = document.getElementById('sets_' + blockId);
         Array.from(container.children).forEach((row, idx) => row.querySelector('.set-number').textContent = idx + 1);
+    }
+    
+    function quickAddSet(blockId) {
+        const container = document.getElementById('sets_' + blockId);
+        const lastSet = container.lastElementChild;
+        let weight = '', reps = '';
+        if (lastSet) {
+            weight = lastSet.querySelector('.set-weight').value || '';
+            reps = lastSet.querySelector('.set-reps').value || '';
+        }
+        addSet(blockId, reps, weight);
     }
     
     function removeExerciseBlock(blockId) { document.getElementById(blockId).remove(); }
