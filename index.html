@@ -378,6 +378,10 @@
         .no-workout { text-align: center; color: var(--text-faint); padding: 2rem; font-size: 0.9rem; }
         
         /* Benchmark Styles */
+        .benchmark-info-card { background: var(--bg-tertiary); border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
+        .benchmark-info-title { font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; font-size: 0.9rem; }
+        .benchmark-info-text { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; }
+        .benchmark-selectors { display: flex; gap: 0.75rem; margin-bottom: 1rem; }
         .score-card { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); border-radius: 12px; padding: 1.25rem; color: #fff; margin-bottom: 1.5rem; text-align: center; }
         .score-label { font-size: 0.8rem; opacity: 0.9; margin-bottom: 0.25rem; }
         .score-value { font-size: 2.5rem; font-weight: 700; }
@@ -740,8 +744,41 @@
             <!-- Benchmark Tab -->
             <div id="benchmark" class="tab-content">
                 <div id="benchmarkMain">
+                    <div class="benchmark-info-card">
+                        <div class="benchmark-info-title">🎯 What is this?</div>
+                        <div class="benchmark-info-text">Track your performance against <strong>top 10% fitness standards</strong> for your age and gender. Log trials over time to measure progress toward elite-level bodyweight fitness.</div>
+                    </div>
+                    
+                    <div class="benchmark-selectors">
+                        <div class="form-group" style="flex:1;margin-bottom:0;">
+                            <label class="form-label">Gender</label>
+                            <select id="benchmarkGender" class="select" onchange="updateBenchmarkStandards()">
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="flex:1;margin-bottom:0;">
+                            <label class="form-label">Age Group</label>
+                            <select id="benchmarkAge" class="select" onchange="updateBenchmarkStandards()">
+                                <option value="18-29">18-29</option>
+                                <option value="30-39">30-39</option>
+                                <option value="40-49">40-49</option>
+                                <option value="50-59">50-59</option>
+                                <option value="60+">60+</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="flex:1;margin-bottom:0;">
+                            <label class="form-label">Target</label>
+                            <select id="benchmarkPercentile" class="select" onchange="updateBenchmarkStandards()">
+                                <option value="10">Top 10%</option>
+                                <option value="5">Top 5%</option>
+                                <option value="1">Top 1%</option>
+                            </select>
+                        </div>
+                    </div>
+                    
                     <div class="score-card">
-                        <div class="score-label">Top 10% Score</div>
+                        <div class="score-label" id="scoreLabel">Top 10% Score</div>
                         <div class="score-value" id="currentScore">--</div>
                         <div class="score-subtitle">of 10 benchmarks achieved</div>
                     </div>
@@ -926,18 +963,89 @@
     
     const IMPORTED_WORKOUTS = {"2026-01-01":[{"name":"Thursday Back and Biceps Pull-Up Day","time":"13:05","total_sets":6,"calories":43,"exercises":[{"name":"Pull-Up","sets":6,"reps":30,"weight":185}]}],"2026-01-11":[{"name":"Sunday Afternoon Lats, Biceps, and Traps Focus","time":"15:23","total_sets":9,"calories":22,"exercises":[{"name":"Pull-Up","sets":5,"reps":50,"weight":185},{"name":"Push-Up","sets":4,"reps":100,"weight":0}]}],"2026-01-12":[{"name":"Monday Morning Workout","time":"05:14","total_sets":15,"calories":350,"exercises":[{"name":"Pull-Up","sets":3,"reps":22,"weight":185},{"name":"Push-Up","sets":3,"reps":75,"weight":0},{"name":"Dumbbell Bicep Curl","sets":3,"reps":36,"weight":25},{"name":"Barbell Deadlift","sets":3,"reps":36,"weight":135},{"name":"Kettlebell Swing","sets":3,"reps":36,"weight":50}]},{"name":"Monday Afternoon Walk","time":"12:23","total_sets":0,"calories":156,"exercises":[]}],"2026-01-13":[{"name":"Tuesday Morning Workout","time":"05:12","total_sets":15,"calories":284,"exercises":[{"name":"Pull-Up","sets":3,"reps":30,"weight":185},{"name":"Push-Up","sets":3,"reps":75,"weight":0},{"name":"Barbell Deadlift","sets":3,"reps":36,"weight":45},{"name":"Kettlebell Swing","sets":3,"reps":36,"weight":15},{"name":"Dumbbell Bicep Curl","sets":3,"reps":18,"weight":25}]},{"name":"Monday Afternoon Walk","time":"13:05","total_sets":0,"calories":83,"exercises":[]}],"2026-01-14":[{"name":"Morning Workout Template","time":"05:54","total_sets":12,"calories":63,"exercises":[{"name":"Pull-Up","sets":4,"reps":40,"weight":185},{"name":"Push-Up","sets":4,"reps":100,"weight":0},{"name":"Dumbbell Bicep Curl","sets":4,"reps":40,"weight":25}]},{"name":"Wednesday Afternoon Walk","time":"12:32","total_sets":0,"calories":179,"exercises":[]}],"2026-01-17":[{"name":"Monday Morning Deadlift, Back, and Biceps Session","time":"11:21","total_sets":17,"calories":256,"exercises":[{"name":"Pull-Up","sets":4,"reps":40,"weight":185},{"name":"Barbell Deadlift","sets":4,"reps":48,"weight":135},{"name":"Kettlebell Swing","sets":4,"reps":32,"weight":20},{"name":"Dumbbell Preacher Curl","sets":1,"reps":8,"weight":15},{"name":"Back Extension","sets":4,"reps":48,"weight":0}]}],"2026-01-22":[{"name":"Morning Workout Template","time":"06:44","total_sets":4,"calories":58,"exercises":[{"name":"Pull-Up","sets":4,"reps":40,"weight":185}]}],"2026-01-23":[{"name":"Morning Workout Template","time":"08:21","total_sets":10,"calories":204,"exercises":[{"name":"Pull-Up","sets":5,"reps":50,"weight":185},{"name":"Push-Up","sets":5,"reps":125,"weight":0}]}],"2026-01-24":[{"name":"Sunday Morning Lats, Traps, and Biceps","time":"11:50","total_sets":4,"calories":58,"exercises":[{"name":"Pull-Up","sets":4,"reps":40,"weight":185}]}],"2026-01-25":[{"name":"Sunday Afternoon Lats, Biceps, and Traps Focus","time":"10:36","total_sets":10,"calories":131,"exercises":[{"name":"Pull-Up","sets":10,"reps":100,"weight":185}]},{"name":"Sunday Afternoon Lower Back, Hamstrings, Glutes, and Biceps","time":"15:41","total_sets":16,"calories":133,"exercises":[{"name":"Barbell Deadlift","sets":3,"reps":36,"weight":135},{"name":"Kettlebell Swing","sets":3,"reps":44,"weight":50},{"name":"Barbell Seated Good Morning","sets":3,"reps":24,"weight":40},{"name":"Back Extension","sets":3,"reps":36,"weight":0},{"name":"Dumbbell Bicep Curl","sets":4,"reps":80,"weight":20}]}],"2026-01-26":[{"name":"Monday Afternoon Walk","time":"12:25","total_sets":0,"calories":209,"exercises":[]}],"2026-01-27":[{"name":"Wednesday Evening Chest, Shoulders, Triceps Focus","time":"17:43","total_sets":4,"calories":146,"exercises":[{"name":"Push-Up","sets":4,"reps":100,"weight":0}]}],"2026-01-28":[{"name":"Wednesday Evening Lats, Traps, and Biceps Builder","time":"17:51","total_sets":5,"calories":146,"exercises":[{"name":"Pull-Up","sets":5,"reps":50,"weight":185}]},{"name":"Wednesday Evening Chest and Lats Focus","time":"18:26","total_sets":9,"calories":189,"exercises":[{"name":"Pull-Up","sets":5,"reps":50,"weight":185},{"name":"Push-Up","sets":4,"reps":80,"weight":0}]}],"2026-01-30":[{"name":"Friday Night Walk","time":"16:11","total_sets":0,"calories":840,"exercises":[]}],"2026-01-31":[{"name":"Saturday Morning Lats, Biceps, and Traps Focus","time":"06:56","total_sets":10,"calories":146,"exercises":[{"name":"Pull-Up","sets":10,"reps":100,"weight":185}]},{"name":"Saturday Morning Walk","time":"08:28","total_sets":0,"calories":781,"exercises":[]}],"2026-02-01":[{"name":"Hamstrings, Glutes, Shoulders, and Biceps Afternoon","time":"11:46","total_sets":23,"calories":292,"exercises":[{"name":"Barbell Romanian Deadlift","sets":4,"reps":40,"weight":135},{"name":"Dumbbell Lateral Raise","sets":4,"reps":32,"weight":15},{"name":"Dumbbell Front Raise","sets":8,"reps":64,"weight":15},{"name":"Dumbbell Preacher Curl","sets":4,"reps":32,"weight":25},{"name":"Dumbbell Shoulder Press","sets":3,"reps":24,"weight":15}]}],"2026-02-04":[{"name":"Wednesday Morning Chest and Lats Focus","time":"05:51","total_sets":10,"calories":255,"exercises":[{"name":"Pull-Up","sets":5,"reps":50,"weight":185},{"name":"Push-Up","sets":5,"reps":75,"weight":0}]},{"name":"Wednesday Afternoon Walk","time":"12:03","total_sets":0,"calories":198,"exercises":[]},{"name":"Wednesday Night Chest and Back Focus","time":"21:03","total_sets":10,"calories":182,"exercises":[{"name":"Pull-Up","sets":5,"reps":50,"weight":185},{"name":"Push-Up","sets":5,"reps":75,"weight":0}]}],"2026-02-05":[{"name":"Thursday Afternoon Walk","time":"12:31","total_sets":0,"calories":101,"exercises":[]}],"2026-02-06":[{"name":"Friday Morning Chest and Lats Upper Body Focus","time":"08:02","total_sets":8,"calories":270,"exercises":[{"name":"Push-Up","sets":4,"reps":100,"weight":0},{"name":"Pull-Up","sets":4,"reps":60,"weight":185}]}],"2026-02-08":[{"name":"Sunday Morning Lat Focus and Biceps Pull Session","time":"09:37","total_sets":10,"calories":219,"exercises":[{"name":"Pull-Up","sets":10,"reps":150,"weight":185}]},{"name":"Sunday Morning Shoulders, Biceps, and Posterior Chain Focus","time":"10:54","total_sets":24,"calories":327,"exercises":[{"name":"Dumbbell Preacher Curl","sets":4,"reps":32,"weight":25},{"name":"Kettlebell Upright Row","sets":4,"reps":48,"weight":50},{"name":"Dumbbell Lateral Raise","sets":8,"reps":62,"weight":10},{"name":"Barbell Romanian Deadlift","sets":4,"reps":42,"weight":135},{"name":"Dumbbell Bicep Curl","sets":4,"reps":40,"weight":20}]}],"2026-02-10":[{"name":"Tuesday Afternoon Walk","time":"12:20","total_sets":0,"calories":151,"exercises":[]}],"2026-02-12":[{"name":"Friday Evening Pull-Up Session","time":"14:44","total_sets":3,"calories":219,"exercises":[{"name":"Pull-Up","sets":3,"reps":45,"weight":185}]}],"2026-02-13":[{"name":"Friday Night Chest and Lats Bodyweight Session","time":"22:11","total_sets":8,"calories":233,"exercises":[{"name":"Pull-Up","sets":4,"reps":60,"weight":185},{"name":"Push-Up","sets":4,"reps":100,"weight":0}]}],"2026-02-14":[{"name":"Saturday Morning Pull-Ups","time":"10:26","total_sets":1,"calories":99,"exercises":[{"name":"Pull-Up","sets":1,"reps":17,"weight":185}]}],"2026-02-18":[{"name":"Thursday Morning Pull-Ups","time":"18:45","total_sets":3,"calories":43,"exercises":[{"name":"Pull-Up","sets":3,"reps":30,"weight":185}]}],"2026-02-19":[{"name":"Thursday Morning Upper Body Focus","time":"05:08","total_sets":8,"calories":204,"exercises":[{"name":"Pull-Up","sets":4,"reps":40,"weight":185},{"name":"Push-Up","sets":4,"reps":100,"weight":0}]},{"name":"Thursday Morning Chest and Lats","time":"06:40","total_sets":2,"calories":204,"exercises":[{"name":"Pull-Up","sets":1,"reps":10,"weight":185},{"name":"Push-Up","sets":1,"reps":25,"weight":0}]}],"2026-02-21":[{"name":"Saturday Evening Walk","time":"16:54","total_sets":0,"calories":6,"exercises":[]},{"name":"Saturday Evening Walk","time":"17:28","total_sets":0,"calories":81,"exercises":[]}],"2026-02-24":[{"name":"Tuesday Night Pull-Ups","time":"00:51","total_sets":4,"calories":58,"exercises":[{"name":"Pull-Up","sets":4,"reps":40,"weight":185}]},{"name":"Tuesday Night Pull-Ups","time":"09:34","total_sets":6,"calories":87,"exercises":[{"name":"Pull-Up","sets":6,"reps":60,"weight":185}]}],"2026-02-25":[{"name":"Wednesday Night Pull-Up Session","time":"18:45","total_sets":1,"calories":87,"exercises":[{"name":"Pull-Up","sets":1,"reps":10,"weight":185}]}],"2026-02-26":[{"name":"Thursday Afternoon Walk","time":"12:11","total_sets":0,"calories":153,"exercises":[]},{"name":"Thursday Night Pull-Ups","time":"22:00","total_sets":4,"calories":58,"exercises":[{"name":"Pull-Up","sets":4,"reps":40,"weight":185}]}],"2026-02-27":[{"name":"Friday Evening Pull-Ups","time":"12:00","total_sets":10,"calories":146,"exercises":[{"name":"Pull-Up","sets":10,"reps":100,"weight":185}]},{"name":"Friday Night Walk","time":"18:45","total_sets":0,"calories":462,"exercises":[]}],"2026-02-28":[{"name":"Saturday Night Walk","time":"18:19","total_sets":0,"calories":441,"exercises":[]}],"2026-03-02":[{"name":"Monday Afternoon Walk","time":"11:55","total_sets":0,"calories":6,"exercises":[]},{"name":"Monday Afternoon Walk","time":"12:39","total_sets":0,"calories":130,"exercises":[]}],"2026-03-03":[{"name":"Tuesday Afternoon Walk","time":"12:02","total_sets":0,"calories":152,"exercises":[]}],"2026-03-04":[{"name":"Wednesday Night Pull-Up Focus","time":"21:07","total_sets":5,"calories":146,"exercises":[{"name":"Pull-Up","sets":5,"reps":50,"weight":185}]}],"2026-03-06":[{"name":"Friday Morning Pull-Ups","time":"10:43","total_sets":4,"calories":87,"exercises":[{"name":"Pull-Up","sets":4,"reps":50,"weight":185}]}],"2026-03-07":[{"name":"Saturday Night Bodyweight Chest and Lats","time":"18:54","total_sets":8,"calories":233,"exercises":[{"name":"Pull-Up","sets":4,"reps":60,"weight":185},{"name":"Push-Up","sets":4,"reps":100,"weight":0}]}],"2026-03-08":[{"name":"Sunday Morning Chest and Lats Focus","time":"10:34","total_sets":6,"calories":204,"exercises":[{"name":"Pull-Up","sets":3,"reps":30,"weight":185},{"name":"Push-Up","sets":3,"reps":75,"weight":0}]},{"name":"Sunday Afternoon Chest and Lats Workout","time":"13:45","total_sets":6,"calories":153,"exercises":[{"name":"Pull-Up","sets":3,"reps":30,"weight":185},{"name":"Push-Up","sets":3,"reps":75,"weight":0}]}],"2026-03-11":[{"name":"Wednesday Afternoon Chest and Lats Calisthenics","time":"12:09","total_sets":6,"calories":153,"exercises":[{"name":"Pull-Up","sets":3,"reps":30,"weight":185},{"name":"Push-Up","sets":3,"reps":75,"weight":0}]}]};
     
-    const BENCHMARKS = [
-        { id: 'pullups', name: 'Pull-Ups', goal: 15, unit: 'reps', type: 'reps' },
-        { id: 'pushups', name: 'Push-Ups', goal: 40, unit: 'reps', type: 'reps' },
-        { id: 'dips', name: 'Dips', goal: 20, unit: 'reps', type: 'reps' },
-        { id: 'pistols', name: 'Pistol Squats', goal: 10, unit: 'per leg', type: 'reps' },
-        { id: 'legraises', name: 'Hanging Leg Raises', goal: 15, unit: 'reps', type: 'reps' },
-        { id: 'burpees', name: 'Burpees (1 min)', goal: 20, unit: 'reps', type: 'reps' },
-        { id: 'plank', name: 'Plank Hold', goal: 180, unit: 'sec', type: 'time' },
-        { id: 'lsit', name: 'L-Sit Hold', goal: 30, unit: 'sec', type: 'time' },
-        { id: 'muscleups', name: 'Muscle-Ups', goal: 3, unit: 'reps', type: 'reps' },
-        { id: 'hspu', name: 'Handstand Push-Ups', goal: 5, unit: 'reps', type: 'reps' }
+    const BENCHMARK_STANDARDS = {
+        // Male standards by age group and percentile
+        male: {
+            '18-29': {
+                '10': { pullups: 18, pushups: 50, dips: 25, pistols: 12, legraises: 18, burpees: 22, plank: 180, lsit: 35, muscleups: 5, hspu: 8 },
+                '5': { pullups: 22, pushups: 60, dips: 30, pistols: 15, legraises: 22, burpees: 26, plank: 240, lsit: 45, muscleups: 8, hspu: 12 },
+                '1': { pullups: 30, pushups: 80, dips: 40, pistols: 20, legraises: 28, burpees: 32, plank: 300, lsit: 60, muscleups: 12, hspu: 18 }
+            },
+            '30-39': {
+                '10': { pullups: 15, pushups: 40, dips: 20, pistols: 10, legraises: 15, burpees: 20, plank: 180, lsit: 30, muscleups: 3, hspu: 5 },
+                '5': { pullups: 20, pushups: 52, dips: 26, pistols: 12, legraises: 18, burpees: 24, plank: 240, lsit: 40, muscleups: 6, hspu: 10 },
+                '1': { pullups: 26, pushups: 70, dips: 35, pistols: 16, legraises: 24, burpees: 30, plank: 300, lsit: 50, muscleups: 10, hspu: 15 }
+            },
+            '40-49': {
+                '10': { pullups: 12, pushups: 35, dips: 15, pistols: 8, legraises: 12, burpees: 17, plank: 150, lsit: 25, muscleups: 2, hspu: 3 },
+                '5': { pullups: 16, pushups: 45, dips: 22, pistols: 10, legraises: 15, burpees: 21, plank: 200, lsit: 35, muscleups: 4, hspu: 6 },
+                '1': { pullups: 22, pushups: 60, dips: 30, pistols: 14, legraises: 20, burpees: 26, plank: 270, lsit: 45, muscleups: 7, hspu: 10 }
+            },
+            '50-59': {
+                '10': { pullups: 8, pushups: 28, dips: 12, pistols: 5, legraises: 10, burpees: 14, plank: 120, lsit: 20, muscleups: 1, hspu: 2 },
+                '5': { pullups: 12, pushups: 38, dips: 18, pistols: 8, legraises: 13, burpees: 18, plank: 180, lsit: 28, muscleups: 2, hspu: 4 },
+                '1': { pullups: 18, pushups: 50, dips: 25, pistols: 12, legraises: 18, burpees: 23, plank: 240, lsit: 38, muscleups: 4, hspu: 7 }
+            },
+            '60+': {
+                '10': { pullups: 5, pushups: 20, dips: 8, pistols: 3, legraises: 8, burpees: 10, plank: 90, lsit: 15, muscleups: 0, hspu: 1 },
+                '5': { pullups: 8, pushups: 28, dips: 12, pistols: 5, legraises: 10, burpees: 14, plank: 140, lsit: 22, muscleups: 1, hspu: 2 },
+                '1': { pullups: 12, pushups: 40, dips: 18, pistols: 8, legraises: 14, burpees: 18, plank: 200, lsit: 30, muscleups: 2, hspu: 4 }
+            }
+        },
+        // Female standards by age group and percentile
+        female: {
+            '18-29': {
+                '10': { pullups: 8, pushups: 35, dips: 15, pistols: 10, legraises: 15, burpees: 20, plank: 180, lsit: 30, muscleups: 2, hspu: 5 },
+                '5': { pullups: 12, pushups: 45, dips: 20, pistols: 12, legraises: 18, burpees: 24, plank: 240, lsit: 40, muscleups: 4, hspu: 8 },
+                '1': { pullups: 18, pushups: 60, dips: 28, pistols: 16, legraises: 24, burpees: 30, plank: 300, lsit: 50, muscleups: 6, hspu: 12 }
+            },
+            '30-39': {
+                '10': { pullups: 6, pushups: 28, dips: 12, pistols: 8, legraises: 12, burpees: 17, plank: 150, lsit: 25, muscleups: 1, hspu: 3 },
+                '5': { pullups: 10, pushups: 38, dips: 16, pistols: 10, legraises: 15, burpees: 21, plank: 200, lsit: 35, muscleups: 2, hspu: 6 },
+                '1': { pullups: 15, pushups: 50, dips: 24, pistols: 14, legraises: 20, burpees: 26, plank: 270, lsit: 45, muscleups: 4, hspu: 10 }
+            },
+            '40-49': {
+                '10': { pullups: 4, pushups: 22, dips: 8, pistols: 6, legraises: 10, burpees: 14, plank: 120, lsit: 20, muscleups: 1, hspu: 2 },
+                '5': { pullups: 7, pushups: 30, dips: 12, pistols: 8, legraises: 13, burpees: 18, plank: 170, lsit: 28, muscleups: 1, hspu: 4 },
+                '1': { pullups: 12, pushups: 42, dips: 18, pistols: 12, legraises: 18, burpees: 23, plank: 240, lsit: 38, muscleups: 3, hspu: 7 }
+            },
+            '50-59': {
+                '10': { pullups: 2, pushups: 18, dips: 5, pistols: 4, legraises: 8, burpees: 11, plank: 90, lsit: 15, muscleups: 0, hspu: 1 },
+                '5': { pullups: 4, pushups: 25, dips: 8, pistols: 6, legraises: 10, burpees: 14, plank: 140, lsit: 22, muscleups: 0, hspu: 2 },
+                '1': { pullups: 8, pushups: 35, dips: 14, pistols: 10, legraises: 14, burpees: 19, plank: 200, lsit: 30, muscleups: 1, hspu: 4 }
+            },
+            '60+': {
+                '10': { pullups: 1, pushups: 12, dips: 3, pistols: 2, legraises: 5, burpees: 8, plank: 60, lsit: 10, muscleups: 0, hspu: 0 },
+                '5': { pullups: 2, pushups: 18, dips: 5, pistols: 4, legraises: 7, burpees: 11, plank: 100, lsit: 16, muscleups: 0, hspu: 1 },
+                '1': { pullups: 5, pushups: 28, dips: 10, pistols: 6, legraises: 11, burpees: 15, plank: 160, lsit: 24, muscleups: 0, hspu: 2 }
+            }
+        }
+    };
+    
+    const BENCHMARK_EXERCISES = [
+        { id: 'pullups', name: 'Pull-Ups', unit: 'reps', type: 'reps' },
+        { id: 'pushups', name: 'Push-Ups', unit: 'reps', type: 'reps' },
+        { id: 'dips', name: 'Dips', unit: 'reps', type: 'reps' },
+        { id: 'pistols', name: 'Pistol Squats', unit: 'per leg', type: 'reps' },
+        { id: 'legraises', name: 'Hanging Leg Raises', unit: 'reps', type: 'reps' },
+        { id: 'burpees', name: 'Burpees (1 min)', unit: 'reps', type: 'reps' },
+        { id: 'plank', name: 'Plank Hold', unit: 'sec', type: 'time' },
+        { id: 'lsit', name: 'L-Sit Hold', unit: 'sec', type: 'time' },
+        { id: 'muscleups', name: 'Muscle-Ups', unit: 'reps', type: 'reps' },
+        { id: 'hspu', name: 'Handstand Push-Ups', unit: 'reps', type: 'reps' }
     ];
+    
+    function getBenchmarks() {
+        const gender = document.getElementById('benchmarkGender')?.value || 'male';
+        const age = document.getElementById('benchmarkAge')?.value || '30-39';
+        const percentile = document.getElementById('benchmarkPercentile')?.value || '10';
+        const standards = BENCHMARK_STANDARDS[gender][age][percentile];
+        return BENCHMARK_EXERCISES.map(b => ({ ...b, goal: standards[b.id] }));
+    }
+    
+    function getSelectedPercentile() {
+        return document.getElementById('benchmarkPercentile')?.value || '10';
+    }
     
     // ===================== STATE =====================
     let appData = {
@@ -1827,15 +1935,44 @@
     function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
     
     // ===================== BENCHMARKS =====================
+    function updateBenchmarkStandards() {
+        const gender = document.getElementById('benchmarkGender').value;
+        const age = document.getElementById('benchmarkAge').value;
+        const percentile = document.getElementById('benchmarkPercentile').value;
+        localStorage.setItem('benchmarkGender', gender);
+        localStorage.setItem('benchmarkAge', age);
+        localStorage.setItem('benchmarkPercentile', percentile);
+        renderBenchmarks();
+    }
+    
+    function loadBenchmarkSettings() {
+        const savedGender = localStorage.getItem('benchmarkGender');
+        const savedAge = localStorage.getItem('benchmarkAge');
+        const savedPercentile = localStorage.getItem('benchmarkPercentile');
+        if (savedGender && document.getElementById('benchmarkGender')) {
+            document.getElementById('benchmarkGender').value = savedGender;
+        }
+        if (savedAge && document.getElementById('benchmarkAge')) {
+            document.getElementById('benchmarkAge').value = savedAge;
+        }
+        if (savedPercentile && document.getElementById('benchmarkPercentile')) {
+            document.getElementById('benchmarkPercentile').value = savedPercentile;
+        }
+    }
+    
     function renderBenchmarks() {
+        loadBenchmarkSettings();
+        const BENCHMARKS = getBenchmarks();
+        const percentile = getSelectedPercentile();
         const latest = getLatestBenchmarkScores();
         const achieved = BENCHMARKS.filter(b => latest[b.id] && latest[b.id].value >= b.goal).length;
+        document.getElementById('scoreLabel').textContent = `Top ${percentile}% Score`;
         document.getElementById('currentScore').textContent = achieved;
         document.getElementById('benchmarkSummary').innerHTML = BENCHMARKS.map(b => {
             const data = latest[b.id];
             const value = data ? data.value : null;
             const status = !value ? 'working' : value >= b.goal ? 'achieved' : value >= b.goal * 0.8 ? 'close' : 'working';
-            const statusLabel = status === 'achieved' ? 'Top 10%' : status === 'close' ? 'Close!' : 'Working';
+            const statusLabel = status === 'achieved' ? `Top ${percentile}%` : status === 'close' ? 'Close!' : 'Working';
             return `<div class="benchmark-card">
                 <div class="benchmark-exercise">
                     <span class="benchmark-exercise-name">${b.name}</span>
@@ -1858,6 +1995,7 @@
     }
     
     function startNewTrial() {
+        const BENCHMARKS = getBenchmarks();
         document.getElementById('benchmarkMain').style.display = 'none';
         document.getElementById('benchmarkForm').style.display = 'block';
         document.getElementById('trialDate').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
@@ -1877,6 +2015,7 @@
     }
     
     function saveTrial() {
+        const BENCHMARKS = getBenchmarks();
         const scores = {};
         let hasData = false;
         BENCHMARKS.forEach(b => { const val = document.getElementById(`input-${b.id}`).value.trim(); scores[b.id] = val !== '' ? parseFloat(val) : null; if (val !== '') hasData = true; });
@@ -1890,6 +2029,7 @@
     function cancelTrial() { document.getElementById('benchmarkMain').style.display = 'block'; document.getElementById('benchmarkForm').style.display = 'none'; }
     
     function renderTrialHistory() {
+        const BENCHMARKS = getBenchmarks();
         if (appData.benchmarkTrials.length === 0) {
             document.getElementById('trialHistory').innerHTML = '<div class="empty-state"><div class="empty-state-icon">🎯</div><div>No trials logged yet</div></div>';
             return;
