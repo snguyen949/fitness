@@ -337,18 +337,139 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 0.2rem;
-            padding: 0.4rem 0.6rem;
+            gap: 0.15rem;
+            padding: 0.4rem 0.2rem;
             border: none;
             background: transparent;
             color: var(--text-faint);
-            font-size: 0.6rem;
+            font-size: 0.5rem;
             font-weight: 500;
             cursor: pointer;
-            min-width: 60px;
+            min-width: 45px;
+            flex: 1;
         }
-        .tab-btn svg { width: 20px; height: 20px; }
+        .tab-btn svg { width: 18px; height: 18px; }
         .tab-btn.active { color: var(--accent-blue); }
+        
+        /* Welcome Screen */
+        .welcome-screen {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--bg-primary);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .welcome-screen.hidden { display: none; }
+        .welcome-content {
+            text-align: center;
+            width: 100%;
+            max-width: 350px;
+        }
+        .welcome-logo { margin-bottom: 2.5rem; }
+        .welcome-title-small {
+            font-size: 1rem;
+            font-weight: 300;
+            letter-spacing: 0.4em;
+            color: var(--text-muted);
+            margin-bottom: -0.25rem;
+        }
+        .welcome-title-big {
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            color: var(--text-primary);
+            line-height: 1;
+            position: relative;
+            display: inline-block;
+        }
+        .welcome-title-big::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 4px;
+            background: var(--accent-blue);
+            border-radius: 2px;
+        }
+        .welcome-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.75rem;
+            letter-spacing: 0.1em;
+        }
+        .welcome-profiles {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        .welcome-profile-btn {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.25rem;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .welcome-profile-btn:hover, .welcome-profile-btn:active {
+            border-color: var(--accent-blue);
+            background: var(--bg-tertiary);
+        }
+        .welcome-profile-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: white;
+        }
+        .welcome-profile-info { text-align: left; flex: 1; }
+        .welcome-profile-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .welcome-profile-stats {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        .welcome-create-btn {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1rem;
+        }
+        .welcome-sync-status {
+            margin-top: 1.5rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .welcome-sync-status .sync-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .welcome-sync-status .sync-dot.syncing {
+            background: #eab308;
+            animation: pulse 1s infinite;
+        }
+        .welcome-sync-status .sync-dot.synced { background: #22c55e; }
+        .welcome-sync-status .sync-dot.offline { background: #ef4444; }
         
         /* Common Styles */
         .section-header {
@@ -1717,6 +1838,8 @@
         .source-badge { font-size: 0.65rem; padding: 0.15rem 0.4rem; border-radius: 4px; font-weight: 600; margin-left: 0.5rem; }
         .source-badge.imported { background: var(--bg-tertiary); color: var(--text-muted); }
         .source-badge.manual { background: var(--accent-blue); color: #fff; }
+        .source-badge.spartan { background: linear-gradient(135deg, #dc2626, #b91c1c); color: #fff; }
+        .source-badge.benchmark { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; }
         
         .workout-entry { background: var(--bg-workout-entry); border-radius: 12px; padding: 1rem; margin-bottom: 0.75rem; position: relative; }
         .workout-entry .workout-name { font-weight: 600; font-size: 1.05rem; color: var(--text-primary); margin-bottom: 0.35rem; padding-right: 70px; line-height: 1.3; }
@@ -1939,7 +2062,7 @@
                 
                 <div class="workout-actions-grid">
                     <button class="workout-action-card primary" onclick="startNewWorkout()">
-                        <div class="action-icon">➕</div>
+                        <div class="action-icon">💪</div>
                         <div class="action-title">New Workout</div>
                         <div class="action-subtitle">Start from scratch</div>
                     </button>
@@ -1949,12 +2072,12 @@
                         <div class="action-subtitle">Run, walk, bike</div>
                     </button>
                     <button class="workout-action-card" onclick="copyLastWorkout()">
-                        <div class="action-icon">📋</div>
+                        <div class="action-icon">🔄</div>
                         <div class="action-title">Copy Last</div>
                         <div class="action-subtitle">Repeat recent</div>
                     </button>
                     <button class="workout-action-card" onclick="showTemplates()">
-                        <div class="action-icon">📁</div>
+                        <div class="action-icon">📑</div>
                         <div class="action-title">Templates</div>
                         <div class="action-subtitle">Saved routines</div>
                     </button>
@@ -2246,12 +2369,23 @@
         <!-- Tab Bar -->
         <div class="tab-bar">
             <button class="tab-btn active" onclick="switchTab('workout', this)">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="3.5" r="2.5"/>
+                    <path d="M10 7h4a2 2 0 012 2v3H8V9a2 2 0 012-2z"/>
+                    <rect x="3.5" y="11" width="17" height="2" rx=".5"/>
+                    <rect x="1.5" y="9.5" width="3" height="5" rx=".75"/>
+                    <rect x="19.5" y="9.5" width="3" height="5" rx=".75"/>
+                    <path d="M10 14h4v2l1 6h-2l-.5-4h-1l-.5 4H9l1-6v-2z"/>
+                </svg>
                 Workout
             </button>
             <button class="tab-btn" onclick="switchTab('spartan', this)">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343M7 10h4v4"/></svg>
                 Spartan
+            </button>
+            <button class="tab-btn" onclick="switchTab('benchmark', this)">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                Benchmark
             </button>
             <button class="tab-btn" onclick="switchTab('log', this)">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
@@ -2261,6 +2395,26 @@
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                 Stats
             </button>
+        </div>
+    </div>
+    
+    <!-- Welcome Screen (shown on first load) -->
+    <div class="welcome-screen" id="welcomeScreen">
+        <div class="welcome-content">
+            <div class="welcome-logo">
+                <div class="welcome-title-small">THE</div>
+                <div class="welcome-title-big">WORK</div>
+                <div class="welcome-subtitle">Track. Train. Transform.</div>
+            </div>
+            <div class="welcome-profiles" id="welcomeProfiles">
+                <!-- Populated by JS -->
+            </div>
+            <button class="btn btn-primary welcome-create-btn" onclick="showWelcomeAddProfile()">
+                + Create New Profile
+            </button>
+            <div class="welcome-sync-status" id="welcomeSyncStatus">
+                <span class="sync-dot syncing"></span> Connecting to cloud...
+            </div>
         </div>
     </div>
     
@@ -2537,10 +2691,20 @@
         } else if (saved === 'light') {
             isDarkMode = false;
         } else {
-            // Check system preference
+            // No preference saved - use system preference
             isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
         }
         applyTheme();
+        
+        // Listen for system theme changes (only applies if user hasn't set manual preference)
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            const saved = localStorage.getItem('workoutTrackerTheme');
+            if (!saved || saved === 'auto') {
+                isDarkMode = e.matches;
+                applyTheme();
+                renderDashboard();
+            }
+        });
     }
     
     function toggleTheme() {
@@ -2548,6 +2712,13 @@
         localStorage.setItem('workoutTrackerTheme', isDarkMode ? 'dark' : 'light');
         applyTheme();
         // Re-render charts with new colors
+        renderDashboard();
+    }
+    
+    function setThemeAuto() {
+        localStorage.removeItem('workoutTrackerTheme');
+        isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        applyTheme();
         renderDashboard();
     }
     
@@ -2691,62 +2862,135 @@
     let allUsers = {};
     const SYNC_URL = 'https://api.npoint.io/6994669acd01d1ec6082';
     let syncUrl = SYNC_URL;
-    let isSyncing = false;
+    let isSyncingFrom = false;
+    let isSyncingTo = false;
     let selectedProfileColor = '#3b82f6';
     
     // ===================== STORAGE =====================
     function loadData() {
-        try {
-            // Load current user ID from localStorage (for quick load)
-            currentUserId = localStorage.getItem('currentUserId');
-            
-            // Load all users from localStorage (for quick load)
+        // Always try cloud first since it's the source of truth
+        syncFromCloud().then(() => {
+            // Check if we need to create Song's profile (migration from old data)
+            migrateSongProfile();
+            // Show welcome screen for user selection
+            showWelcomeScreen();
+        }).catch(e => {
+            console.log('Cloud sync failed, using local:', e);
+            // Fallback to local data if cloud fails
             const savedUsers = localStorage.getItem('allUsers');
             if (savedUsers) {
                 allUsers = JSON.parse(savedUsers);
             }
+            // Check if we need to create Song's profile (migration from old data)
+            migrateSongProfile();
+            showWelcomeScreen();
+        });
+    }
+    
+    function migrateSongProfile() {
+        // If no users exist, check for old data and create Song's profile
+        if (Object.keys(allUsers).length === 0) {
+            const existingData = localStorage.getItem('workoutTrackerData');
+            const songId = 'user_song';
             
-            // If no users exist locally, check cloud first, then create default
-            if (Object.keys(allUsers).length === 0) {
-                // Try cloud first
-                syncFromCloud().then(() => {
-                    if (Object.keys(allUsers).length === 0) {
-                        // No cloud data either, create Song profile and migrate existing data
-                        const existingData = localStorage.getItem('workoutTrackerData');
-                        const songId = 'user_song';
-                        allUsers[songId] = {
-                            id: songId,
-                            name: 'Song',
-                            color: '#3b82f6',
-                            createdAt: new Date().toISOString()
-                        };
-                        currentUserId = songId;
-                        
-                        if (existingData) {
-                            const parsed = JSON.parse(existingData);
-                            appData = { ...appData, ...parsed };
-                        }
-                        
-                        saveAllUsers();
-                        saveUserData();
-                        localStorage.setItem('currentUserId', currentUserId);
-                    }
-                    updateProfileUI();
-                    refreshAll();
-                });
-            } else {
-                // Load current user's data from localStorage
-                if (!currentUserId || !allUsers[currentUserId]) {
-                    currentUserId = Object.keys(allUsers)[0];
-                    localStorage.setItem('currentUserId', currentUserId);
+            // Create Song profile (the original user with imported workouts)
+            allUsers[songId] = {
+                id: songId,
+                name: 'Song',
+                color: '#3b82f6',
+                createdAt: new Date().toISOString()
+            };
+            
+            // Migrate old workout data if exists
+            if (existingData) {
+                try {
+                    const parsed = JSON.parse(existingData);
+                    localStorage.setItem('userData_' + songId, JSON.stringify(parsed));
+                } catch (e) {
+                    console.log('Error migrating old data:', e);
                 }
-                loadUserData();
-                updateProfileUI();
-                
-                // Then sync from cloud to get latest
-                syncFromCloud();
             }
-        } catch (e) { console.log('Error loading data:', e); }
+            
+            saveAllUsers();
+            syncToCloud();
+        }
+    }
+    
+    function showWelcomeScreen() {
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const welcomeProfiles = document.getElementById('welcomeProfiles');
+        const syncStatus = document.getElementById('welcomeSyncStatus');
+        
+        // Update sync status
+        if (Object.keys(allUsers).length > 0) {
+            syncStatus.innerHTML = '<span class="sync-dot synced"></span> Connected to cloud';
+        } else {
+            syncStatus.innerHTML = '<span class="sync-dot synced"></span> Ready';
+        }
+        
+        // Render existing profiles
+        const userList = Object.values(allUsers);
+        if (userList.length === 0) {
+            welcomeProfiles.innerHTML = '<div style="color:var(--text-muted);padding:1rem;font-size:0.9rem;">No profiles yet. Create one to get started!</div>';
+        } else {
+            welcomeProfiles.innerHTML = userList.map(user => {
+                const workoutCount = getWorkoutCountForUser(user.id);
+                return `
+                    <button class="welcome-profile-btn" onclick="selectProfileAndStart('${user.id}')">
+                        <div class="welcome-profile-avatar" style="background:${user.color}">${user.name.charAt(0).toUpperCase()}</div>
+                        <div class="welcome-profile-info">
+                            <div class="welcome-profile-name">${user.name}</div>
+                            <div class="welcome-profile-stats">${workoutCount} workouts</div>
+                        </div>
+                        <svg width="20" height="20" fill="none" stroke="var(--text-muted)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </button>
+                `;
+            }).join('');
+        }
+        
+        welcomeScreen.classList.remove('hidden');
+    }
+    
+    function selectProfileAndStart(userId) {
+        currentUserId = userId;
+        localStorage.setItem('currentUserId', currentUserId);
+        loadUserData();
+        updateProfileUI();
+        
+        // Hide welcome screen
+        document.getElementById('welcomeScreen').classList.add('hidden');
+        
+        // Initialize app features
+        loadChallenges();
+        loadChallengesFromCloud();
+        loadSpartanFromCloud();
+        populateExerciseSelect();
+        
+        // Set current date based on latest workout
+        const all = getAllWorkouts();
+        const dates = Object.keys(all).sort();
+        if (dates.length > 0) {
+            const latest = dates[dates.length - 1];
+            currentYear = parseInt(latest.substring(0, 4));
+            currentMonth = parseInt(latest.substring(5, 7)) - 1;
+        }
+        
+        // Start the app
+        refreshAll();
+        startAutoSync();
+    }
+    
+    function showWelcomeAddProfile() {
+        document.getElementById('welcomeScreen').classList.add('hidden');
+        document.getElementById('newProfileName').value = '';
+        selectedProfileColor = '#3b82f6';
+        document.querySelectorAll('.color-option').forEach(btn => {
+            btn.classList.toggle('selected', btn.dataset.color === selectedProfileColor);
+        });
+        openModal('addProfileModal');
+        
+        // Flag that we came from welcome screen
+        window.fromWelcomeScreen = true;
     }
     
     function loadUserData() {
@@ -2807,10 +3051,10 @@
     }
     
     async function syncToCloud() {
-        if (isSyncing) return;
+        if (isSyncingTo) return;
         
         try {
-            isSyncing = true;
+            isSyncingTo = true;
             updateSyncIndicator('syncing');
             
             // Get current cloud data
@@ -2818,22 +3062,29 @@
             if (!response.ok) throw new Error('Failed to fetch');
             let cloudData = await response.json();
             
-            // Update current user's data in cloud
+            // Initialize if needed
             if (!cloudData.users) cloudData.users = {};
             if (!cloudData.userData) cloudData.userData = {};
             if (!cloudData.userSettings) cloudData.userSettings = {};
             
-            cloudData.users[currentUserId] = allUsers[currentUserId];
-            cloudData.userData[currentUserId] = appData;
+            // Sync ALL users (not just current)
+            Object.keys(allUsers).forEach(userId => {
+                cloudData.users[userId] = allUsers[userId];
+            });
             
-            // Save all user settings
-            cloudData.userSettings[currentUserId] = {
-                weeklyGoal: localStorage.getItem('weeklyGoal') || '4',
-                theme: localStorage.getItem('workoutTrackerTheme') || 'light',
-                benchmarkGender: localStorage.getItem('benchmarkGender') || 'male',
-                benchmarkAge: localStorage.getItem('benchmarkAge') || '30-39',
-                benchmarkPercentile: localStorage.getItem('benchmarkPercentile') || '10'
-            };
+            // Sync current user's workout data
+            if (currentUserId) {
+                cloudData.userData[currentUserId] = appData;
+                
+                // Save current user's settings
+                cloudData.userSettings[currentUserId] = {
+                    weeklyGoal: localStorage.getItem('weeklyGoal') || '4',
+                    theme: localStorage.getItem('workoutTrackerTheme') || 'light',
+                    benchmarkGender: localStorage.getItem('benchmarkGender') || 'male',
+                    benchmarkAge: localStorage.getItem('benchmarkAge') || '30-39',
+                    benchmarkPercentile: localStorage.getItem('benchmarkPercentile') || '10'
+                };
+            }
             
             cloudData.lastUpdated = new Date().toISOString();
             
@@ -2853,30 +3104,31 @@
             console.log('Sync to cloud failed:', e);
             updateSyncIndicator('offline');
         } finally {
-            isSyncing = false;
+            isSyncingTo = false;
         }
     }
     
     async function syncFromCloud() {
-        if (isSyncing) return;
+        if (isSyncingFrom) return;
         
         try {
-            isSyncing = true;
+            isSyncingFrom = true;
             updateSyncIndicator('syncing');
             
             const response = await fetch(syncUrl);
             if (!response.ok) throw new Error('Failed to fetch');
             const cloudData = await response.json();
             
-            // Merge ALL users from cloud
-            if (cloudData.users) {
-                Object.keys(cloudData.users).forEach(userId => {
-                    allUsers[userId] = cloudData.users[userId];
-                });
+            // Load ALL users from cloud
+            if (cloudData.users && Object.keys(cloudData.users).length > 0) {
+                allUsers = cloudData.users;
                 saveAllUsers();
                 
-                // Set current user if not set
-                if (!currentUserId && Object.keys(allUsers).length > 0) {
+                // Set current user - prefer localStorage value if valid, otherwise first user
+                const savedUserId = localStorage.getItem('currentUserId');
+                if (savedUserId && allUsers[savedUserId]) {
+                    currentUserId = savedUserId;
+                } else if (!currentUserId || !allUsers[currentUserId]) {
                     currentUserId = Object.keys(allUsers)[0];
                     localStorage.setItem('currentUserId', currentUserId);
                 }
@@ -2928,7 +3180,7 @@
             console.log('Sync from cloud failed:', e);
             updateSyncIndicator('offline');
         } finally {
-            isSyncing = false;
+            isSyncingFrom = false;
         }
     }
     
@@ -3609,7 +3861,40 @@
     function completeSpartanWorkout() {
         if (!currentSpartanWorkout) return;
         
+        // Save to Spartan progress
         saveSpartanProgress(currentSpartanWorkout.id);
+        
+        // Also add to workout log so it shows in Calendar
+        const now = new Date();
+        const exercises = currentSpartanMode === 'bodyweight' 
+            ? currentSpartanWorkout.bodyweight 
+            : currentSpartanWorkout.gym;
+        
+        const workoutEntry = {
+            id: 'spartan_' + currentSpartanWorkout.id + '_' + Date.now(),
+            name: `Spartan: ${currentSpartanWorkout.name}`,
+            date: now.toISOString().split('T')[0],
+            time: now.toTimeString().slice(0, 5),
+            type: 'spartan',
+            spartanId: currentSpartanWorkout.id,
+            spartanWeek: currentSpartanWorkout.week,
+            duration: currentSpartanWorkout.duration,
+            focus: currentSpartanWorkout.focus,
+            mode: currentSpartanMode,
+            total_sets: exercises.length,
+            calories: Math.round(parseInt(currentSpartanWorkout.duration) * 8), // ~8 cal/min estimate
+            exercises: exercises.map(ex => ({
+                name: ex.name,
+                sets: 1,
+                reps: ex.sets,
+                notes: ex.notes
+            })),
+            source: 'spartan'
+        };
+        
+        appData.workouts.push(workoutEntry);
+        saveData();
+        
         closeModal('spartanWorkoutModal');
         renderSpartanTab();
         
@@ -3677,17 +3962,26 @@
     }
     
     function getWorkoutCountForUser(userId) {
+        let count = 0;
+        
+        // Add imported workouts count only for Song
+        if (userId === 'user_song') {
+            Object.values(IMPORTED_WORKOUTS).forEach(dayWorkouts => {
+                count += dayWorkouts.length;
+            });
+        }
+        
         if (userId === currentUserId) {
-            return appData.workouts.length;
+            return count + appData.workouts.length;
         }
         try {
             const saved = localStorage.getItem('userData_' + userId);
             if (saved) {
                 const data = JSON.parse(saved);
-                return (data.workouts || []).length;
+                return count + (data.workouts || []).length;
             }
         } catch (e) {}
-        return 0;
+        return count;
     }
     
     function switchProfile(userId) {
@@ -3729,7 +4023,7 @@
         });
     }
     
-    function createProfile() {
+    async function createProfile() {
         const name = document.getElementById('newProfileName').value.trim();
         if (!name) {
             alert('Please enter a name');
@@ -3745,10 +4039,17 @@
         };
         
         saveAllUsers();
-        syncToCloud();
+        await syncToCloud(); // Wait for cloud sync to complete
         
         closeModal('addProfileModal');
-        switchProfile(userId);
+        
+        // If came from welcome screen, start the app with this profile
+        if (window.fromWelcomeScreen) {
+            window.fromWelcomeScreen = false;
+            selectProfileAndStart(userId);
+        } else {
+            switchProfile(userId);
+        }
     }
     
     function exportData() {
@@ -4087,12 +4388,14 @@
             } catch (e) {}
         }
         
-        // Also include imported workouts for the user (they share imported data)
-        Object.entries(IMPORTED_WORKOUTS).forEach(([date, ws]) => {
-            if (date >= challenge.startDate && date <= challenge.endDate) {
-                ws.forEach(w => workouts.push({ ...w, date }));
-            }
-        });
+        // Only include imported workouts for Song (original user)
+        if (userId === 'user_song') {
+            Object.entries(IMPORTED_WORKOUTS).forEach(([date, ws]) => {
+                if (date >= challenge.startDate && date <= challenge.endDate) {
+                    ws.forEach(w => workouts.push({ ...w, date }));
+                }
+            });
+        }
         
         // Calculate based on challenge type
         switch (challenge.type) {
@@ -4201,10 +4504,14 @@
     
     function getAllWorkouts() {
         const all = {};
-        Object.entries(IMPORTED_WORKOUTS).forEach(([date, workouts]) => {
-            if (!all[date]) all[date] = [];
-            workouts.forEach(w => all[date].push({ ...w, source: 'imported' }));
-        });
+        // Only show imported workouts for Song (the original user)
+        if (currentUserId === 'user_song') {
+            Object.entries(IMPORTED_WORKOUTS).forEach(([date, workouts]) => {
+                if (!all[date]) all[date] = [];
+                workouts.forEach(w => all[date].push({ ...w, source: 'imported' }));
+            });
+        }
+        // Add this user's manual workouts
         appData.workouts.forEach(w => {
             const date = w.date;
             if (!all[date]) all[date] = [];
@@ -4970,6 +5277,10 @@
             
             const sourceBadge = w.source === 'imported' 
                 ? '<span class="source-badge imported">Imported</span>' 
+                : w.source === 'spartan'
+                ? '<span class="source-badge spartan">🏔️ Spartan</span>'
+                : w.source === 'benchmark'
+                ? '<span class="source-badge benchmark">⚡ Benchmark</span>'
                 : '';
             
             const workoutData = encodeURIComponent(JSON.stringify({id: w.id, name: w.name, date: dateStr, time: w.time, exercises: w.exercises, total_sets: w.total_sets, notes: w.notes}));
@@ -5312,6 +5623,10 @@
                 
                 const sourceBadge = w.source === 'imported' 
                     ? '<span class="source-badge imported">Imported</span>' 
+                    : w.source === 'spartan'
+                    ? '<span class="source-badge spartan">🏔️ Spartan</span>'
+                    : w.source === 'benchmark'
+                    ? '<span class="source-badge benchmark">⚡ Benchmark</span>'
                     : '';
                 
                 const workoutData = encodeURIComponent(JSON.stringify({id: w.id, name: w.name, date, time: w.time, exercises: w.exercises, total_sets: w.total_sets, notes: w.notes}));
@@ -5427,6 +5742,10 @@
                 if (!w.exercises || w.exercises.length === 0) return;
                 const sourceBadge = w.source === 'imported' 
                     ? '<span class="source-badge imported">Imported</span>' 
+                    : w.source === 'spartan'
+                    ? '<span class="source-badge spartan">🏔️ Spartan</span>'
+                    : w.source === 'benchmark'
+                    ? '<span class="source-badge benchmark">⚡ Benchmark</span>'
                     : '<span class="source-badge manual">Logged</span>';
                 const workoutData = encodeURIComponent(JSON.stringify({id: w.id, name: w.name, date, time: w.time, exercises: w.exercises, total_sets: w.total_sets, notes: w.notes}));
                 html += `<div class="workout-entry">
@@ -5720,7 +6039,15 @@
         showAddExercise();
     }
     
-    function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
+    function closeModal(modalId) { 
+        document.getElementById(modalId).classList.remove('active');
+        
+        // If closing add profile modal and came from welcome screen, go back to welcome
+        if (modalId === 'addProfileModal' && window.fromWelcomeScreen) {
+            window.fromWelcomeScreen = false;
+            showWelcomeScreen();
+        }
+    }
     
     // ===================== BENCHMARKS =====================
     function updateBenchmarkStandards() {
@@ -5806,9 +6133,46 @@
         const BENCHMARKS = getBenchmarks();
         const scores = {};
         let hasData = false;
-        BENCHMARKS.forEach(b => { const val = document.getElementById(`input-${b.id}`).value.trim(); scores[b.id] = val !== '' ? parseFloat(val) : null; if (val !== '') hasData = true; });
+        const exercisesLogged = [];
+        
+        BENCHMARKS.forEach(b => { 
+            const val = document.getElementById(`input-${b.id}`).value.trim(); 
+            scores[b.id] = val !== '' ? parseFloat(val) : null; 
+            if (val !== '') {
+                hasData = true;
+                exercisesLogged.push({
+                    name: b.name,
+                    sets: 1,
+                    reps: parseFloat(val),
+                    unit: b.unit,
+                    goal: b.goal,
+                    achieved: parseFloat(val) >= b.goal
+                });
+            }
+        });
+        
         if (!hasData) { alert('Enter at least one result'); return; }
-        appData.benchmarkTrials.push({ date: new Date().toISOString(), scores });
+        
+        const now = new Date();
+        
+        // Save to benchmark trials
+        appData.benchmarkTrials.push({ date: now.toISOString(), scores });
+        
+        // Also save as workout entry so it shows in Log and Stats
+        const achieved = exercisesLogged.filter(e => e.achieved).length;
+        const workoutEntry = {
+            id: 'benchmark_' + Date.now(),
+            name: `Fitness Test (${achieved}/${exercisesLogged.length} achieved)`,
+            date: now.toISOString().split('T')[0],
+            time: now.toTimeString().slice(0, 5),
+            type: 'benchmark',
+            total_sets: exercisesLogged.length,
+            calories: Math.round(exercisesLogged.length * 15), // ~15 cal per test
+            exercises: exercisesLogged,
+            source: 'benchmark'
+        };
+        
+        appData.workouts.push(workoutEntry);
         saveData();
         cancelTrial();
         renderBenchmarks();
@@ -6204,7 +6568,7 @@
         
         // Sync every 30 seconds
         syncInterval = setInterval(() => {
-            if (!isSyncing) {
+            if (!isSyncingFrom) {
                 syncFromCloud().then(() => {
                     // Only refresh UI if we got new data
                     refreshAll();
@@ -6214,7 +6578,7 @@
         
         // Also sync when user returns to the app (tab becomes visible)
         document.addEventListener('visibilitychange', () => {
-            if (!document.hidden && !isSyncing) {
+            if (!document.hidden && !isSyncingFrom) {
                 syncFromCloud().then(() => refreshAll());
             }
         });
@@ -6222,21 +6586,15 @@
     
     function init() {
         initTheme();
-        loadData();
-        loadChallenges();
-        loadChallengesFromCloud();
-        loadSpartanFromCloud();
-        renderWorkoutTab();
-        populateExerciseSelect();
-        startAutoSync();
+        loadData(); // This now shows welcome screen
+        // Don't call these until user selects profile - they're called in selectProfileAndStart
+        // loadChallenges();
+        // loadChallengesFromCloud();
+        // loadSpartanFromCloud();
+        // renderWorkoutTab();
+        // populateExerciseSelect();
+        // startAutoSync();
         requestNotificationPermission();
-        const all = getAllWorkouts();
-        const dates = Object.keys(all).sort();
-        if (dates.length > 0) {
-            const latest = dates[dates.length - 1];
-            currentYear = parseInt(latest.substring(0, 4));
-            currentMonth = parseInt(latest.substring(5, 7)) - 1;
-        }
     }
     
     init();
