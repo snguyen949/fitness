@@ -743,6 +743,34 @@
             gap: 0.75rem;
             margin-bottom: 1.25rem;
         }
+        .workout-actions-grid.two-col {
+            grid-template-columns: repeat(2, 1fr);
+            align-items: start;
+        }
+        .workout-action-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .workout-sub-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .sub-action-btn {
+            flex: 1;
+            padding: 0.5rem 0.25rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .sub-action-btn:active {
+            background: var(--bg-tertiary);
+            transform: scale(0.98);
+        }
         .workout-action-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -2060,26 +2088,21 @@
                     </div>
                 </div>
                 
-                <div class="workout-actions-grid">
-                    <button class="workout-action-card primary" onclick="startNewWorkout()">
-                        <div class="action-icon">💪</div>
-                        <div class="action-title">New Workout</div>
-                        <div class="action-subtitle">Start from scratch</div>
-                    </button>
+                <div class="workout-actions-grid two-col">
+                    <div class="workout-action-wrapper">
+                        <button class="workout-action-card primary" onclick="startNewWorkout()">
+                            <div class="action-icon">💪</div>
+                            <div class="action-title">New Workout</div>
+                        </button>
+                        <div class="workout-sub-actions">
+                            <button class="sub-action-btn" onclick="copyLastWorkout()">🔄 Copy Last</button>
+                            <button class="sub-action-btn" onclick="showTemplates()">📑 Templates</button>
+                        </div>
+                    </div>
                     <button class="workout-action-card cardio" onclick="startCardio()">
                         <div class="action-icon">🏃</div>
                         <div class="action-title">Cardio</div>
                         <div class="action-subtitle">Run, walk, bike</div>
-                    </button>
-                    <button class="workout-action-card" onclick="copyLastWorkout()">
-                        <div class="action-icon">🔄</div>
-                        <div class="action-title">Copy Last</div>
-                        <div class="action-subtitle">Repeat recent</div>
-                    </button>
-                    <button class="workout-action-card" onclick="showTemplates()">
-                        <div class="action-icon">📑</div>
-                        <div class="action-title">Templates</div>
-                        <div class="action-subtitle">Saved routines</div>
                     </button>
                 </div>
                 
@@ -2169,7 +2192,7 @@
                     <select id="dashboardPeriod" class="period-dropdown" onchange="updateDashboardPeriod()">
                         <option value="7">Last 7 Days</option>
                         <option value="14">Last 14 Days</option>
-                        <option value="30">Last 30 Days</option>
+                        <option value="30" selected>Last 30 Days</option>
                         <option value="90">Last 90 Days</option>
                         <option value="all">All Time</option>
                     </select>
@@ -2251,13 +2274,6 @@
                 <div class="chart-card"><canvas id="topExercisesChart"></canvas></div>
                 <div class="section-header">📈 Training Volume</div>
                 <div class="chart-card"><canvas id="volumeChart"></canvas></div>
-                
-                <div class="section-header">💾 Data Management</div>
-                <div class="data-actions">
-                    <button class="btn btn-outline btn-small" onclick="exportData()">📥 Export JSON</button>
-                    <button class="btn btn-outline btn-small" onclick="document.getElementById('importInput').click()">📤 Import JSON</button>
-                </div>
-                <input type="file" id="importInput" class="hidden-input" accept=".json" onchange="importData(event)">
                 
                 <div class="section-header">📱 Share Your Progress</div>
                 <div class="data-actions">
@@ -2404,7 +2420,7 @@
             <div class="welcome-logo">
                 <div class="welcome-title-small">THE</div>
                 <div class="welcome-title-big">WORK</div>
-                <div class="welcome-subtitle">Track. Train. Transform.</div>
+                <div class="welcome-subtitle">Data-driven gains.</div>
             </div>
             <div class="welcome-profiles" id="welcomeProfiles">
                 <!-- Populated by JS -->
